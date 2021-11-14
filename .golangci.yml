@@ -1,0 +1,32 @@
+# options for analysis running
+run:
+  modules-download-mode: readonly
+
+# output configuration options
+output:
+  # sorts results by: filepath, line and column
+  sort-results: true
+
+linters:
+  enable:
+    - errorlint
+    - exhaustive
+    - exportloopref
+    - goconst
+    - gofmt
+    - goimports
+    - gosec
+    - unparam
+
+issues:
+  exclude-rules:
+    # Exclude some linters from running on tests files.
+    - path: _test\.go
+      linters:
+        - dupl
+        - errcheck
+        - gocyclo
+        - gosec
+
+  # Fix found issues (if it's supported by the linter)
+  fix: true
