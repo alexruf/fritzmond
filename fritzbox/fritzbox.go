@@ -3,6 +3,7 @@ package fritzbox
 import (
 	"bytes"
 	"context"
+	"encoding/xml"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -27,33 +28,90 @@ func New(ctx context.Context, digestAuthClient DigestAuthClient, url string) Fri
 	}
 }
 
-func (f Fritzbox) GetCommonLinkProperties() (interface{}, error) {
+func (f Fritzbox) GetCommonLinkProperties() (*CommonLinkProperties, error) {
 	ctx, cancel := context.WithCancel(f.ctx)
 	defer cancel()
 
-	data := []byte("<?xml version=\"1.0\"?><s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body><u:GetCommonLinkProperties xmlns:u=\"urn:dslforum-org:service:WANCommonInterfaceConfig:1\"/></s:Body></s:Envelope>")
-	reqUrl := f.buildUrl("/upnp/control/wancommonifconfig1")
+	var result soapEnvelope
+	if err := f.executeRequest(ctx, requests[getCommonLinkProperties], &result); err != nil {
+		return nil, err
+	}
+	return result.Body.CommonLinkProperties, nil
+}
+
+func (f Fritzbox) GetTotalBytesSent() (*TotalBytesSent, error) {
+	ctx, cancel := context.WithCancel(f.ctx)
+	defer cancel()
+
+	var result soapEnvelope
+	if err := f.executeRequest(ctx, requests[getTotalBytesSent], &result); err != nil {
+		return nil, err
+	}
+	return result.Body.TotalBytesSent, nil
+}
+
+func (f Fritzbox) GetTotalBytesReceived() (*TotalBytesReceived, error) {
+	ctx, cancel := context.WithCancel(f.ctx)
+	defer cancel()
+
+	var result soapEnvelope
+	if err := f.executeRequest(ctx, requests[getTotalBytesReceived], &result); err != nil {
+		return nil, err
+	}
+	return result.Body.TotalBytesReceived, nil
+}
+
+func (f Fritzbox) GetTotalPacketsSent() (*TotalPacketsSent, error) {
+	ctx, cancel := context.WithCancel(f.ctx)
+	defer cancel()
+
+	var result soapEnvelope
+	if err := f.executeRequest(ctx, requests[getTotalPacketsSent], &result); err != nil {
+		return nil, err
+	}
+	return result.Body.TotalPacketsSent, nil
+}
+
+func (f Fritzbox) GetTotalPacketsReceived() (*TotalPacketsReceived, error) {
+	ctx, cancel := context.WithCancel(f.ctx)
+	defer cancel()
+
+	var result soapEnvelope
+	if err := f.executeRequest(ctx, requests[getTotalPacketsReceived], &result); err != nil {
+		return nil, err
+	}
+	return result.Body.TotalPacketsReceived, nil
+}
+
+func (f Fritzbox) executeRequest(ctx context.Context, params requestParams, out interface{}) error {
+	reqUrl := f.buildUrl(params.path)
+	data := buildRequestBody(params)
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, reqUrl, bytes.NewReader(data))
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	req.Header.Set("Content-Type", "text/xml; charset=utf-8")
-	req.Header.Set("SoapAction", "urn:dslforum-org:service:WANCommonInterfaceConfig:1#GetCommonLinkProperties")
+	req.Header.Set("SoapAction", params.Urn+"#"+params.Action.String())
 
 	resp, err := f.digestAuthClient.Do(req)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
-		return nil, fmt.Errorf("request failed with status: %s", resp.Status)
+		return fmt.Errorf("request failed with status: %s", resp.Status)
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return body, nil
+	if len(body) > 0 {
+		if err := xml.Unmarshal(body, out); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (f Fritzbox) buildUrl(path string) string {

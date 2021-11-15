@@ -31,7 +31,7 @@ func main() {
 		return
 	}
 	if err := cfg.Validate(); err != nil {
-		log.Printf("Error in configuration: %s", err)
+		log.Printf("Error in configuration: %s\n", err)
 		return
 	}
 
