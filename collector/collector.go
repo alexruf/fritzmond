@@ -50,48 +50,32 @@ func (c Collector) run() {
 		log.Println(err.Error())
 	}
 	if commonLinkProperties != nil {
-		log.Printf("GetCommonLinkProperties: %+v\n", *commonLinkProperties)
+		log.Printf("CommonLinkProperties: %+v\n", *commonLinkProperties)
 	} else {
-		log.Println("GetCommonLinkProperties: <empty>")
+		log.Println("CommonLinkProperties: <empty>")
 	}
 
 	totalBytesSent, err := c.fritzbox.GetTotalBytesSent()
 	if err != nil {
 		log.Println(err.Error())
 	}
-	if totalBytesSent != nil {
-		log.Printf("GetTotalBytesSent: %+v\n", *totalBytesSent)
-	} else {
-		log.Println("GetTotalBytesSent: <empty>")
-	}
+	log.Printf("TotalBytesSent: %d\n", totalBytesSent)
 
 	totalBytesReceived, err := c.fritzbox.GetTotalBytesReceived()
 	if err != nil {
 		log.Println(err.Error())
 	}
-	if totalBytesReceived != nil {
-		log.Printf("GetTotalBytesReceived: %+v\n", *totalBytesReceived)
-	} else {
-		log.Println("GetTotalBytesReceived: <empty>")
-	}
+	log.Printf("TotalBytesReceived: %d\n", totalBytesReceived)
 
 	totalPacketsSent, err := c.fritzbox.GetTotalPacketsSent()
 	if err != nil {
 		log.Println(err.Error())
 	}
-	if totalPacketsSent != nil {
-		log.Printf("GetTotalPacketsSent: %+v\n", *totalPacketsSent)
-	} else {
-		log.Println("GetTotalPacketsSent: <empty>")
-	}
+	log.Printf("TotalPacketsSent: %d\n", totalPacketsSent)
 
 	totalPacketsReceived, err := c.fritzbox.GetTotalPacketsReceived()
 	if err != nil {
 		log.Println(err.Error())
 	}
-	if totalPacketsReceived != nil {
-		log.Printf("GetTotalPacketsReceived: %+v\n", *totalPacketsReceived)
-	} else {
-		log.Println("GetTotalPacketsReceived: <empty>")
-	}
+	log.Printf("TotalPacketsReceived: %d\n", totalPacketsReceived)
 }

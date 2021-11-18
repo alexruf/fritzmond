@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -39,48 +40,60 @@ func (f Fritzbox) GetCommonLinkProperties() (*CommonLinkProperties, error) {
 	return result.Body.CommonLinkProperties, nil
 }
 
-func (f Fritzbox) GetTotalBytesSent() (*TotalBytesSent, error) {
+func (f Fritzbox) GetTotalBytesSent() (uint, error) {
 	ctx, cancel := context.WithCancel(f.ctx)
 	defer cancel()
 
 	var result soapEnvelope
 	if err := f.executeRequest(ctx, requests[getTotalBytesSent], &result); err != nil {
-		return nil, err
+		return 0, err
 	}
-	return result.Body.TotalBytesSent, nil
+	if result.Body.TotalBytesSent == nil {
+		return 0, errors.New("no data received")
+	}
+	return result.Body.TotalBytesSent.NewTotalBytesSent, nil
 }
 
-func (f Fritzbox) GetTotalBytesReceived() (*TotalBytesReceived, error) {
+func (f Fritzbox) GetTotalBytesReceived() (uint, error) {
 	ctx, cancel := context.WithCancel(f.ctx)
 	defer cancel()
 
 	var result soapEnvelope
 	if err := f.executeRequest(ctx, requests[getTotalBytesReceived], &result); err != nil {
-		return nil, err
+		return 0, err
 	}
-	return result.Body.TotalBytesReceived, nil
+	if result.Body.TotalBytesReceived == nil {
+		return 0, errors.New("no data received")
+	}
+	return result.Body.TotalBytesReceived.NewTotalBytesReceived, nil
 }
 
-func (f Fritzbox) GetTotalPacketsSent() (*TotalPacketsSent, error) {
+func (f Fritzbox) GetTotalPacketsSent() (uint, error) {
 	ctx, cancel := context.WithCancel(f.ctx)
 	defer cancel()
 
 	var result soapEnvelope
 	if err := f.executeRequest(ctx, requests[getTotalPacketsSent], &result); err != nil {
-		return nil, err
+		return 0, err
 	}
-	return result.Body.TotalPacketsSent, nil
+	if result.Body.TotalPacketsSent == nil {
+		return 0, errors.New("no data received")
+	}
+	return result.Body.TotalPacketsSent.NewTotalPacketsSent, nil
 }
 
-func (f Fritzbox) GetTotalPacketsReceived() (*TotalPacketsReceived, error) {
+func (f Fritzbox) GetTotalPacketsReceived() (uint, error) {
 	ctx, cancel := context.WithCancel(f.ctx)
 	defer cancel()
 
 	var result soapEnvelope
 	if err := f.executeRequest(ctx, requests[getTotalPacketsReceived], &result); err != nil {
-		return nil, err
+		return 0, err
 	}
-	return result.Body.TotalPacketsReceived, nil
+	if result.Body.TotalPacketsReceived == nil {
+		return 0, errors.New("no data received")
+	}
+	return result.Body.TotalPacketsReceived.NewTotalPacketsReceived, nil
 }
 
 func (f Fritzbox) executeRequest(ctx context.Context, params requestParams, out interface{}) error {
