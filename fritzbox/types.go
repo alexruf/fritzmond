@@ -20,10 +20,10 @@ func (w WANAccessType) String() string {
 }
 
 const (
-	WANAccessTypeDSL         = "DSL"
-	WANAccessTypeEthernet    = "Ethernet"
-	WANAccessTypeXAVMDEFiber = "X_AVM-DE_Fiber"
-	WANAccessTypeXAVMDEUMTS  = "X_AVM-DE_UMTS"
-	WANAccessTypeXAVMDECable = "X_AVM-DE_Cable"
-	WANAccessTypeXAVMDELTE   = "X_AVM-DE_LTE"
+	WANAccessTypeDSL         WANAccessType = "DSL"
+	WANAccessTypeEthernet    WANAccessType = "Ethernet"
+	WANAccessTypeXAVMDEFiber WANAccessType = "X_AVM-DE_Fiber"
+	WANAccessTypeXAVMDEUMTS  WANAccessType = "X_AVM-DE_UMTS"
+	WANAccessTypeXAVMDECable WANAccessType = "X_AVM-DE_Cable"
+	WANAccessTypeXAVMDELTE   WANAccessType = "X_AVM-DE_LTE"
 )

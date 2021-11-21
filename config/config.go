@@ -10,6 +10,7 @@ type Config struct {
 	Password      string
 	TlsSkipVerify bool
 	Interval      uint
+	DataPath      string
 }
 
 // Validate returns and error in case the values in Config violate some basic validation rules.
