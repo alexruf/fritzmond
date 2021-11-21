@@ -14,7 +14,7 @@ const (
 
 // ConvertPhysicalLinkStatus converts the physical link status string to a float64 metric value.
 // 1 = Up;
-// 1.5 = Initializing;
+// 0.5 = Initializing;
 // 0 = Down;
 // -1 = Unavailable;
 func ConvertPhysicalLinkStatus(status fritzbox.PhysicalLinkStatus) float64 {
@@ -22,7 +22,7 @@ func ConvertPhysicalLinkStatus(status fritzbox.PhysicalLinkStatus) float64 {
 	case fritzbox.PhysicalLinkStatusUp:
 		return 1
 	case fritzbox.PhysicalLinkStatusInitializing:
-		return 1.5
+		return 0.5
 	case fritzbox.PhysicalLinkStatusDown:
 		return 0
 	case fritzbox.PhysicalLinkStatusUnavailable:
