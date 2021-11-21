@@ -57,14 +57,7 @@ func (c Collector) run() {
 
 	log.Printf("Start collecting data from FRITZ!Box (%s)\n", fritzUrl.String())
 
-	labels := []tstorage.Label{
-		{
-			Name:  "host",
-			Value: fritzUrl.Host,
-		},
-	}
 	var rows []tstorage.Row
-
 	commonLinkProperties, err := c.fritzbox.GetCommonLinkProperties()
 	if err != nil {
 		log.Println(err.Error())
@@ -73,7 +66,6 @@ func (c Collector) run() {
 		rows = append(rows,
 			tstorage.Row{
 				Metric: metrics.MetricPhysicalLinkStatus,
-				Labels: nil,
 				DataPoint: tstorage.DataPoint{
 					Value:     metrics.ConvertPhysicalLinkStatus(commonLinkProperties.NewPhysicalLinkStatus),
 					Timestamp: timestamp,
@@ -81,7 +73,6 @@ func (c Collector) run() {
 			},
 			tstorage.Row{
 				Metric: metrics.MetricLayer1DownstreamMaxBitRate,
-				Labels: labels,
 				DataPoint: tstorage.DataPoint{
 					Value:     float64(commonLinkProperties.NewLayer1DownstreamMaxBitRate),
 					Timestamp: timestamp,
@@ -89,7 +80,6 @@ func (c Collector) run() {
 			},
 			tstorage.Row{
 				Metric: metrics.MetricLayer1UpstreamMaxBitRate,
-				Labels: labels,
 				DataPoint: tstorage.DataPoint{
 					Value:     float64(commonLinkProperties.NewLayer1UpstreamMaxBitRate),
 					Timestamp: timestamp,
@@ -103,7 +93,6 @@ func (c Collector) run() {
 	} else {
 		rows = append(rows, tstorage.Row{
 			Metric: metrics.MetricTotalBytesSent,
-			Labels: labels,
 			DataPoint: tstorage.DataPoint{
 				Value:     float64(totalBytesSent),
 				Timestamp: time.Now().UTC().Unix(),
@@ -117,7 +106,6 @@ func (c Collector) run() {
 	} else {
 		rows = append(rows, tstorage.Row{
 			Metric: metrics.MetricTotalBytesReceived,
-			Labels: labels,
 			DataPoint: tstorage.DataPoint{
 				Value:     float64(totalBytesReceived),
 				Timestamp: time.Now().UTC().Unix(),
@@ -131,7 +119,6 @@ func (c Collector) run() {
 	} else {
 		rows = append(rows, tstorage.Row{
 			Metric: metrics.MetricTotalPacketsSent,
-			Labels: labels,
 			DataPoint: tstorage.DataPoint{
 				Value:     float64(totalPacketsSent),
 				Timestamp: time.Now().UTC().Unix(),
@@ -145,7 +132,6 @@ func (c Collector) run() {
 	} else {
 		rows = append(rows, tstorage.Row{
 			Metric: metrics.MetricTotalPacketsReceived,
-			Labels: labels,
 			DataPoint: tstorage.DataPoint{
 				Value:     float64(totalPacketsReceived),
 				Timestamp: time.Now().UTC().Unix(),
