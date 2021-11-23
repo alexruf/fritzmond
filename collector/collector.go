@@ -36,6 +36,7 @@ func (c Collector) Start(wg *sync.WaitGroup) {
 		}
 	}()
 
+	c.run()
 	ticker := time.NewTicker(time.Duration(c.cfg.Interval) * time.Second)
 	for {
 		select {
