@@ -57,12 +57,12 @@ func (c Collector) run() {
 
 	log.Printf("Start collecting data from FRITZ!Box (%s)\n", fritzUrl.String())
 
+	timestamp := time.Now().Unix()
 	var rows []tstorage.Row
 	commonLinkProperties, err := c.fritzbox.GetCommonLinkProperties()
 	if err != nil {
 		log.Println(err.Error())
 	} else if commonLinkProperties != nil {
-		timestamp := time.Now().UTC().Unix()
 		rows = append(rows,
 			tstorage.Row{
 				Metric: metrics.MetricPhysicalLinkStatus,
@@ -95,7 +95,7 @@ func (c Collector) run() {
 			Metric: metrics.MetricTotalBytesSent,
 			DataPoint: tstorage.DataPoint{
 				Value:     float64(totalBytesSent),
-				Timestamp: time.Now().UTC().Unix(),
+				Timestamp: timestamp,
 			},
 		})
 	}
@@ -108,7 +108,7 @@ func (c Collector) run() {
 			Metric: metrics.MetricTotalBytesReceived,
 			DataPoint: tstorage.DataPoint{
 				Value:     float64(totalBytesReceived),
-				Timestamp: time.Now().UTC().Unix(),
+				Timestamp: timestamp,
 			},
 		})
 	}
@@ -121,7 +121,7 @@ func (c Collector) run() {
 			Metric: metrics.MetricTotalPacketsSent,
 			DataPoint: tstorage.DataPoint{
 				Value:     float64(totalPacketsSent),
-				Timestamp: time.Now().UTC().Unix(),
+				Timestamp: timestamp,
 			},
 		})
 	}
@@ -134,7 +134,7 @@ func (c Collector) run() {
 			Metric: metrics.MetricTotalPacketsReceived,
 			DataPoint: tstorage.DataPoint{
 				Value:     float64(totalPacketsReceived),
-				Timestamp: time.Now().UTC().Unix(),
+				Timestamp: timestamp,
 			},
 		})
 	}

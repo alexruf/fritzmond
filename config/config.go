@@ -8,9 +8,11 @@ type Config struct {
 	Url           string
 	Username      string
 	Password      string
-	TlsSkipVerify bool
+	SkipTlsVerify bool
 	Interval      uint
-	DataPath      string
+	DbPath        string
+	Port          uint
+	DisableWebUi  bool
 }
 
 // Validate returns and error in case the values in Config violate some basic validation rules.
