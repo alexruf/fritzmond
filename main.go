@@ -9,7 +9,9 @@ import (
 	nethttp "net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"sync"
+	"time"
 
 	"github.com/alexruf/fritzmond/collector"
 	"github.com/alexruf/fritzmond/config"
@@ -17,7 +19,7 @@ import (
 	"github.com/alexruf/fritzmond/http"
 	"github.com/alexruf/fritzmond/ui"
 
-	"github.com/nakabonne/tstorage"
+	bolt "go.etcd.io/bbolt"
 )
 
 var usage bool
@@ -30,7 +32,7 @@ func main() {
 	flag.StringVar(&cfg.Password, "password", "", "Password to authenticate with the FRITZ!Box.")
 	flag.BoolVar(&cfg.SkipTlsVerify, "skipTlsVerify", true, "Skip TLS certificate validation.")
 	flag.UintVar(&cfg.Interval, "interval", 10, "Interval in seconds at which data should be fetched from the FRITZ!Box.")
-	flag.StringVar(&cfg.DbPath, "dbpath", "./data", "Path to the directory where database is stored.")
+	flag.StringVar(&cfg.DbPath, "dbpath", "", "Path to the directory where database is stored.")
 	flag.UintVar(&cfg.Port, "port", 8090, "Listen port for the web UI.")
 	flag.BoolVar(&cfg.DisableWebUi, "disableWebUi", false, "Disable the web UI.")
 	flag.Parse()
@@ -47,23 +49,24 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	wg := &sync.WaitGroup{}
 
-	storage, _ := tstorage.NewStorage(
-		tstorage.WithDataPath(cfg.DbPath),
-		tstorage.WithTimestampPrecision(tstorage.Seconds),
-	)
-	defer storage.Close()
+	db, err := bolt.Open(filepath.Join(cfg.DbPath, "fritzmond.db"), 0600, &bolt.Options{Timeout: 1 * time.Second})
+	if err != nil {
+		log.Printf("Error opening database: %s\n", err)
+		return
+	}
+	defer db.Close()
 
 	httpClient := http.NewHttpClient(cfg.SkipTlsVerify)
 	digestAuthClient := http.NewDigestAuthClient(httpClient, cfg.Username, cfg.Password)
 	fb := fritzbox.New(ctx, digestAuthClient, cfg.Url)
 
-	col := collector.New(ctx, cfg, fb, storage)
+	col := collector.New(ctx, cfg, fb, db)
 	wg.Add(1)
 	go col.Start(wg)
 
 	var srv *nethttp.Server
 	if !cfg.DisableWebUi {
-		app := ui.New(storage)
+		app := ui.New(db)
 		app.RegisterRoutes()
 
 		wg.Add(1)

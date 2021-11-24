@@ -1,13 +1,13 @@
 package ui
 
 import (
-	"github.com/nakabonne/tstorage"
+	bolt "go.etcd.io/bbolt"
 )
 
 type server struct {
-	storage tstorage.Storage
+	db *bolt.DB
 }
 
-func New(storage tstorage.Storage) server {
-	return server{storage: storage}
+func New(db *bolt.DB) server {
+	return server{db: db}
 }
